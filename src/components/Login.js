@@ -1,8 +1,94 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Header from "./Header";
+import { signInFormValidater } from "../utils/validations";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../utils/firebaseConfig";
+import { useNavigate } from "react-router-dom";
+import { USER_AVATAR } from "../utils/constants";
+import { useDispatch } from "react-redux";
+import { addUser } from "../redux/userSlice";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
+  const [errorMsg, setErrorMsg] = useState();
+  const name = useRef();
+  const email = useRef();
+  const password = useRef();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const clickHandler = (e) => {
+    e.preventDefault();
+    const errorMsg = signInFormValidater(
+      email.current.value,
+      password.current.value
+    );
+    setErrorMsg(errorMsg);
+
+    if (errorMsg) return;
+    if (!isSignInForm) {
+      // Sign Up
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          updateProfile(auth.currentUser, {
+            displayName: name.current.value,
+            photoURL: USER_AVATAR,
+          })
+            .then(() => {
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                  photoURL: photoURL,
+                })
+              );
+              navigate("/browse");
+            })
+            .catch((error) => {
+              setErrorMsg(error.message);
+            });
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMsg(`${errorCode}- ${errorMessage}`);
+        });
+    } else {
+      //Sign In
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          const { uid, email, displayName, photoURL } = auth.currentUser;
+          dispatch(
+            addUser({
+              uid: uid,
+              email: email,
+              displayName: displayName,
+              photoURL: photoURL,
+            })
+          );
+          navigate("/browse");
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMsg(`${errorCode}- ${errorMessage}`);
+        });
+    }
+  };
   return (
     <div>
       <Header />
@@ -18,6 +104,7 @@ const Login = () => {
         </h1>
         {!isSignInForm && (
           <input
+            ref={name}
             type="text"
             name="email"
             placeholder="Name"
@@ -25,22 +112,28 @@ const Login = () => {
           />
         )}
         <input
+          ref={email}
           type="text"
           name="email"
           placeholder="Email Address"
           className="p-3 w-full bg-black bg-opacity-40 border border-gray-600 rounded-md"
         />
         <input
+          ref={password}
           type="password"
           name="password"
           placeholder="Password"
           className="p-3 my-3 w-full bg-black bg-opacity-40 border border-gray-600 rounded-md"
         />
-        <button className="bg-red-700 my-4 p-2 w-full rounded-md">
-          {isSignInForm ? "Sign Ip" : "Sign Up"}
+        <span className="text-red-500 font-extralight">{errorMsg}</span>
+        <button
+          className="bg-red-700 my-4 p-2 w-full rounded-md"
+          onClick={clickHandler}
+        >
+          {isSignInForm ? "Sign In" : "Sign Up"}
         </button>
         <p
-          className="cursor-pointer"
+          className="cursor-pointer mb-4"
           onClick={() => setIsSignInForm(!isSignInForm)}
         >
           {isSignInForm
