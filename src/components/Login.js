@@ -36,24 +36,21 @@ const Login = () => {
         password.current.value
       )
         .then((userCredential) => {
-          updateProfile(auth.currentUser, {
+          return updateProfile(auth.currentUser, {
             displayName: name.current.value,
             photoURL: USER_AVATAR,
-          })
-            .then(() => {
-              const { uid, email, displayName, photoURL } = auth.currentUser;
-              dispatch(
-                addUser({
-                  uid: uid,
-                  email: email,
-                  displayName: displayName,
-                  photoURL: photoURL,
-                })
-              );
+          });
+        })
+        .then(() => {
+          const { uid, email, displayName, photoURL } = auth.currentUser;
+          dispatch(
+            addUser({
+              uid: uid,
+              email: email,
+              displayName: displayName,
+              photoURL: photoURL,
             })
-            .catch((error) => {
-              setErrorMsg(error.message);
-            });
+          );
         })
         .catch((error) => {
           const errorCode = error.code;
