@@ -1,7 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import Browse from "./Browse";
 import Login from "./Login";
-import { RouterProvider } from "react-router-dom";
+import VideoPlayer from "./VideoPlayer";
 
 const Body = () => {
   const router = createBrowserRouter([
@@ -12,6 +13,10 @@ const Body = () => {
     {
       path: "/browse",
       element: <Browse />,
+    },
+    {
+      path: "/player/:movieId",
+      element: <VideoPlayer />,
     },
   ]);
 

@@ -37,7 +37,7 @@ const Header = () => {
   const handleSignOut = () => {
     signOut(auth)
       .then(() => {
-        removeUser();
+        dispatch(removeUser());
       })
       .catch((error) => {
         // An error happened.

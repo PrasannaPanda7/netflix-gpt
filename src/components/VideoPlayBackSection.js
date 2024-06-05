@@ -2,7 +2,9 @@ import { useSelector } from "react-redux";
 import useMovieTrailer from "../utils/useMovieTrailer";
 
 const VideoPlayBackSection = ({ movieId }) => {
-  const trailer = useSelector((store) => store?.movie?.trailerVideo);
+  const trailer = useSelector(
+    (store) => store?.movie?.trailerVideo?.mainTrailer
+  );
   useMovieTrailer(movieId);
 
   return (

@@ -1,6 +1,6 @@
 const VideoDataSection = ({ title, overview }) => {
   return (
-    <div className="pt-56 px-12 absolute text-white bg-gradient-to-r from-black aspect-video">
+    <div className="pt-56 px-12 absolute text-white bg-gradient-to-r from-black aspect-video h-full">
       <h1 className="text-4xl font-bold w-1/2">{title}</h1>
       <p className="mt-12 w-1/2">{overview}</p>
       <div className="flex gap-2 mt-10">
